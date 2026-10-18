@@ -26,8 +26,8 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         // Rutas libres para pruebas locales de salud
                         .requestMatchers("/api/bff/health").permitAll()
-                        // Cualquier petición hacia el dominio de reservas exige autenticación
-                        .requestMatchers("/api/bff/reservations/**").permitAll() // Cambiar a .authenticated() al evaluar con Azure
+                        // Protegemos la ruta correcta que ahora incluye /bff
+                        .requestMatchers("/api/bff/reservations/**").authenticated()
                         .anyRequest().permitAll()
                 )
                 .oauth2ResourceServer(oauth2 -> oauth2.jwt(Customizer.withDefaults()));
@@ -38,9 +38,9 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOriginPatterns(List.of("*"));
+        config.setAllowedOriginPatterns(List.of("http://localhost:4200")); // Más seguro y previene errores CORS de credenciales
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        config.setAllowedHeaders(List.of("*"));
+        config.setAllowedHeaders(List.of("Authorization", "Content-Type"));
         config.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
